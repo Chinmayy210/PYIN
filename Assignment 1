@@ -1,1 +1,48 @@
-#calculate average grade
+1.calculate average grade
+grades = []
+for i in range(5):
+    grade = float(input("Enter grade {}: ".format(i+1)))
+    grades.append(grade)
+
+average_grade = sum(grades) / len(grades)
+print("Average grade:", average_grade)
+
+2. Number Palindrome 
+number = int(input("Enter a number: "))
+temp = number
+reverse = 0
+
+while temp > 0:
+    digit = temp % 10
+    reverse = reverse * 10 + digit
+    temp = temp // 10
+
+if number == reverse:
+    print("Palindrome")
+else:
+    print("Not Palindrome")
+
+
+3. Word frequency counter
+
+text = input("Enter a sentence or paragraph: ")
+words = text.split()
+
+word_freq = {}
+for word in words:
+    if word in word_freq:
+        word_freq[word] += 1
+    else:
+        word_freq[word] = 1
+
+print("Word Frequency Count:")
+for word, freq in word_freq.items():
+    print(word, ":", freq)
+
+
+4. Reverse a string
+string = input("Enter a string: ")
+
+reversed_string = string[::-1]
+
+print("Reversed string:", reversed_string)
