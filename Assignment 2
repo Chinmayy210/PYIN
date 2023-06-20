@@ -1,0 +1,113 @@
+1. calculator 
+
+import tkinter as tk
+
+def button_click(number):
+    current = output.get()
+    output.delete(0, tk.END)
+    output.insert(tk.END, current + str(number))
+
+def button_clear():
+    output.delete(0, tk.END)
+
+def button_operator(operator):
+    global first_num
+    global math_operator
+    first_num = float(output.get())
+    math_operator = operator
+    output.delete(0, tk.END)
+
+def button_equal():
+    second_num = float(output.get())
+    output.delete(0, tk.END)
+
+    if math_operator == "+":
+        result = first_num + second_num
+    elif math_operator == "-":
+        result = first_num - second_num
+    elif math_operator == "*":
+        result = first_num * second_num
+    elif math_operator == "/":
+        result = first_num / second_num
+
+    output.insert(tk.END, result)
+
+# Create the main window
+window = tk.Tk()
+window.title("Calculator")
+
+# Create the output display
+output = tk.Entry(window, width=20)
+output.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
+
+# Create the number buttons
+button_1 = tk.Button(window, text="1", command=lambda: button_click(1))
+button_1.grid(row=1, column=0)
+button_2 = tk.Button(window, text="2", command=lambda: button_click(2))
+button_2.grid(row=1, column=1)
+button_3 = tk.Button(window, text="3", command=lambda: button_click(3))
+button_3.grid(row=1, column=2)
+# ... buttons for other numbers
+
+# Create the operation buttons
+button_add = tk.Button(window, text="+", command=lambda: button_operator("+"))
+button_add.grid(row=2, column=0)
+button_subtract = tk.Button(window, text="-", command=lambda: button_operator("-"))
+button_subtract.grid(row=2, column=1)
+button_multiply = tk.Button(window, text="*", command=lambda: button_operator("*"))
+button_multiply.grid(row=2, column=2)
+button_divide = tk.Button(window, text="/", command=lambda: button_operator("/"))
+button_divide.grid(row=2, column=3)
+
+# Create the equal button
+button_equal = tk.Button(window, text="=", command=button_equal)
+button_equal.grid(row=3, column=0, columnspan=4)
+
+# Create the clear button
+button_clear = tk.Button(window, text="C", command=button_clear)
+button_clear.grid(row=4, column=0, columnspan=4)
+
+# Start the main event loop
+window.mainloop()
+
+
+
+2. File explorer 
+import os
+import tkinter as tk
+from tkinter import filedialog
+
+def browse_folder():
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        listbox.delete(0, tk.END)  # Clear existing items from the listbox
+        for item in os.listdir(folder_path):
+            listbox.insert(tk.END, item)
+
+def delete_file():
+    selected_item = listbox.curselection()
+    if selected_item:
+        file_name = listbox.get(selected_item)
+        file_path = os.path.join(folder_path, file_name)
+        os.remove(file_path)
+        listbox.delete(selected_item)
+
+# Create the main window
+window = tk.Tk()
+window.title("File Explorer")
+
+# Create the Browse button
+browse_button = tk.Button(window, text="Browse", command=browse_folder)
+browse_button.pack(pady=10)
+
+# Create the Listbox to display file names
+listbox = tk.Listbox(window, width=50)
+listbox.pack()
+
+# Create the Delete button
+delete_button = tk.Button(window, text="Delete", command=delete_file)
+delete_button.pack(pady=10)
+
+# Start the main event loop
+window.mainloop()
+
