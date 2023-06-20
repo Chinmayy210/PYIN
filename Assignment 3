@@ -1,0 +1,57 @@
+Task 1
+
+import requests
+
+from bs4 import BeautifulSoup
+
+# Send a GET request to the BBC News website
+response = requests.get("https://www.bbc.com/news")
+
+# Create a BeautifulSoup object to parse the HTML content
+soup = BeautifulSoup(response.content, "html.parser")
+
+# Find the news headline elements
+headline_elements = soup.find_all("h3", class_="gs-c-promo-heading__title")
+
+# Extract the text from the headline elements
+headlines = [headline.get_text().strip() for headline in headline_elements]
+
+# Print the headlines
+for headline in headlines:
+    print(headline)
+    
+Task 2
+
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# Configure Chrome WebDriver
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Run in headless mode (without opening a browser window)
+chrome_driver_path = "path/to/chromedriver"  # Path to your ChromeDriver executable
+service = Service(chrome_driver_path)
+
+# Create a new instance of the ChromeDriver
+driver = webdriver.Chrome(service=service, options=chrome_options)
+
+# Navigate to the website with dynamically loaded content
+driver.get("https://example.com")
+
+# Wait for the dynamically loaded content to be visible
+wait = WebDriverWait(driver, 10)
+element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "your_element_selector")))
+
+# Perform interactions or extract data from the dynamically loaded content
+# For example, you can use driver.find_element(), driver.find_elements(), etc. to locate elements and interact with them
+
+# Close the driver
+driver.quit()
+
+
+
+
