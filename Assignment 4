@@ -1,0 +1,533 @@
+Task1:
+
+Step 1: Setup
+Create a new Django project using the following command:
+$ django-admin startproject blog_app
+
+Navigate to the project directory:
+$ cd blog_app
+
+Create a new Django app within the project:
+$ python manage.py startapp blog
+
+Step 2: Define Models
+In the blog directory, open the models.py file and define the Post model:
+from django.db import models
+from django.contrib.auth.models import User
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+Step 3: Create Database Tables
+Migrate the database to create the necessary tables:
+$ python manage.py makemigrations
+$ python manage.py migrate
+
+Step 4: Create Views
+Open the views.py file in the blog directory and define the views for creating, reading, updating, and deleting blog posts:
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Post
+from .forms import PostForm
+
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+@login_required
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('post_list')
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_create.html', {'form': form})
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})
+
+@login_required
+def post_update(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_list')
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_update.html', {'form': form, 'post': post})
+
+@login_required
+def post_delete(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.delete()
+    return redirect('post_list')
+
+
+Step 5: Create Forms
+Create a new directory called forms inside the blog directory. In that directory, create a new file called forms.py and define the PostForm:
+from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'content')
+
+Step 6: Define URLs
+Open the urls.py file in the project directory and define the URLs for the blog application:
+from django.urls import path
+from blog import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('create/', views.post_create, name='post_create'),
+    path('<int:pk>/', views.post_detail, name='post_detail'),
+    path('<int:pk>/update/', views.post_update, name='post_update'),
+    path('<int:pk>/delete/', views.post_delete, name='post_delete'),
+]
+
+Step 7: Create Templates
+Create a new directory called templates in the project directory. Inside the templates directory, create another directory called blog. In the blog directory, create the following HTML templates:
+1.post_list.html - Display a list of blog posts:
+{% for post in posts %}
+  <h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+  <p>{{ post.content }}</p>
+  <p>Author: {{ post.author }}</p>
+  <p>Created at: {{ post.created_at }}</p>
+  <p>Updated at: {{ post.updated_at }}</p>
+  <hr>
+{% empty %}
+  <p>No posts available.</p>
+{% endfor %}
+<a href="{% url 'post_create' %}">Create New Post</a>
+
+2.post_create.html - Create a new blog post:
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Create</button>
+</form>
+
+3.post_detail.html - Display details of a specific blog post:
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+<p>Author: {{ post.author }}</p>
+<p>Created at: {{ post.created_at }}</p>
+<p>Updated at: {{ post.updated_at }}</p>
+<a href="{% url 'post_update' pk=post.pk %}">Edit</a>
+<a href="{% url 'post_delete' pk=post.pk %}">Delete</a>
+
+4.post_update.html - Update an existing blog post:
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Update</button>
+</form>
+
+Step 8: Configure Authentication
+Open the settings.py file in the project directory and update the INSTALLED_APPS and AUTHENTICATION_BACKENDS settings:
+
+INSTALLED_APPS = [
+    ...
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+Step 9: Run the Application
+Start the Django development server:
+$ python manage.py runserver
+
+
+
+Task2:
+
+Python and Django installed on your system.
+Let's get started!
+
+Step 1: Setup
+Create a new Django project using the following command:
+
+$ django-admin startproject blog_app
+Navigate to the project directory
+$ cd blog_app
+
+Create a new Django app within the project:
+
+
+$ python manage.py startapp blog
+Step 2: Define Models
+In the blog directory, open the models.py file and define the Post model:
+
+python
+from django.db import models
+from django.contrib.auth.models import User
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+Step 3: Create Database Tables
+Migrate the database to create the necessary tables:
+$ python manage.py makemigrations
+$ python manage.py migrate
+
+Step 4: Create Views
+Open the views.py file in the blog directory and define the views for creating, reading, updating, and deleting blog posts:
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Post
+from .forms import PostForm
+
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+@login_required
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('post_list')
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_create.html', {'form': form})
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})
+
+@login_required
+def post_update(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_list')
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_update.html', {'form': form, 'post': post})
+
+@login_required
+def post_delete(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.delete()
+    return redirect('post_list')
+Step 5: Create Forms
+Create a new directory called forms inside the blog directory. In that directory, create a new file called forms.py and define the PostForm:
+from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'content')
+Step 6: Define URLs
+Open the urls.py file in the project directory and define the URLs for the blog application:
+from django.urls import path
+from blog import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('create/', views.post_create, name='post_create'),
+    path('<int:pk>/', views.post_detail, name='post_detail'),
+    path('<int:pk>/update/', views.post_update, name='post_update'),
+    path('<int:pk>/delete/', views.post_delete, name='post_delete'),
+]
+Step 7: Create Templates
+Create a new directory called templates in the project directory. Inside the templates directory, create another directory called blog. In the blog directory, create the following HTML templates:
+
+post_list.html - Display a list of blog posts:
+html
+{% for post in posts %}
+  <h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+  <p>{{ post.content }}</p>
+  <p>Author: {{ post.author }}</p>
+  <p>Created at: {{ post.created_at }}</p>
+  <p>Updated at: {{ post.updated_at }}</p>
+  <hr>
+{% empty %}
+  <p>No posts available.</p>
+{% endfor %}
+<a href="{% url 'post_create' %}">Create New Post</a>
+
+post_create.html - Create a new blog post:
+html
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Create</button>
+</form>
+
+post_detail.html - Display details of a specific blog post:
+html
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+<p>Author: {{ post.author }}</p>
+<p>Created at: {{ post.created_at }}</p>
+<p>Updated at: {{ post.updated_at }}</p>
+<a href="{% url 'post_update' pk=post.pk %}">Edit</a>
+<a href="{% url 'post_delete' pk=post.pk %}">Delete</a>
+
+post_update.html - Update an existing blog post:
+html
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Update</button>
+</form>
+
+Step 8: Configure Authentication
+Open the settings.py file in the project directory and update the INSTALLED_APPS and AUTHENTICATION_BACKENDS settings:
+
+python
+INSTALLED_APPS = [
+    ...
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+Step 9: Run the Application
+Start the Django development server:
+
+$ python manage.py createsuperuser
+That's it! You have successfully created a simple blog application using Django. Feel free to customize and enhance the application according to your requirements. Happy coding!
+
+
+
+
+
+User
+
+Step 1: Define Comment Model
+In the models.py file within the blog app, add the following code to define the Comment model:
+
+python
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Comment(models.Model):
+    post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comment by {self.author.username} on {self.post.title}'
+
+Step 2: Create Database Tables
+Migrate the database to create the necessary tables:
+
+$ python manage.py makemigrations
+$ python manage.py migrate
+Step 3: Update Post Detail Template
+Open the post_detail.html template in the templates/blog directory and modify it to display existing comments and provide a form to add new comments:
+
+html
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+<p>Author: {{ post.author }}</p>
+<p>Created at: {{ post.created_at }}</p>
+<p>Updated at: {{ post.updated_at }}</p>
+<hr>
+
+<h3>Comments:</h3>
+{% for comment in post.comments.all %}
+  <p>{{ comment.content }}</p>
+  <p>Author: {{ comment.author }}</p>
+  <p>Created at: {{ comment.created_at }}</p>
+  <hr>
+{% empty %}
+  <p>No comments yet.</p>
+{% endfor %}
+
+<hr>
+<h3>Add a Comment:</h3>
+<form method="POST">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  <button type="submit">Post Comment</button>
+</form>
+Step 4: Update Post Detail View
+In the views.py file within the blog app, update the post_detail view to handle comment form submission:
+
+python
+from .forms import PostForm, CommentForm
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', pk=pk)
+    else:
+        comment_form = CommentForm()
+
+    return render(request, 'blog/post_detail.html', {'post': post, 'comment_form': comment_form})
+Step 5: Create Comment Form
+Create a new file forms.py within the blog app directory and define the CommentForm:
+
+python
+from django import forms
+from .models import Post, Comment
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('content',)
+Step 6: Update URLs
+In the urls.py file within the project directory, add a URL pattern for the comment creation:
+
+python
+from django.urls import path
+from blog import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('create/', views.post_create, name='post_create'),
+    path('<int:pk>/', views.post_detail, name='post_detail'),
+    path('<int:pk>/update/', views.post_update, name='post_update'),
+    path('<int:pk>/delete/', views.post_delete, name='post_delete'),
+    path('<int:pk>/comment/', views.add_comment, name='add_comment'),
+]
+Step 7: Create Comment Management Views
+In the views.py file within the blog app, add the following views to manage comments:
+
+python
+@login_required
+def add_comment(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', pk=pk)
+    else:
+        comment_form = CommentForm()
+
+    return render(request, 'blog/add_comment.html', {'comment_form': comment_form})
+
+@login_required
+def edit_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST, instance=comment)
+        if comment_form.is_valid():
+            comment_form.save()
+            return redirect('post_detail', pk=comment.post.pk)
+    else:
+        comment_form = CommentForm(instance=comment)
+
+    return render(request, 'blog/edit_comment.html', {'comment_form': comment_form, 'comment': comment})
+
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    post_pk = comment.post.pk
+    comment.delete()
+    return redirect('post_detail', pk=post_pk)
+Step 8: Create Comment Templates
+Create two new HTML templates within the templates/blog directory:
+
+add_comment.html - Display the form to add a new comment:
+html
+
+<h3>Add a Comment:</h3>
+<form method="POST">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  <button type="submit">Post Comment</button>
+</form>
+edit_comment.html - Edit an existing comment:
+html
+<h3>Edit Comment:</h3>
+<form method="POST">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  <button type="submit">Update Comment</button>
+</form>
+
+Step 9: Update Post Detail URL
+In the post_detail.html template, update the comment form's action attribute to include the post's primary key:
+<form method="POST" action="{% url 'add_comment' pk=post.pk %}">
+Step 10: Update Post Detail View
+In the post_detail view, update the render statement to include the comment_form variable:
+
+python
+return render(request, 'blog/post_detail.html', {'post': post, 'comment_form': comment_form})
+
+Step 11: Update Post Detail Template
+In the post_detail.html template, replace the existing comment section with the following code to display existing comments and provide options to edit or delete the comments:
+
+html
+<h3>Comments:</h3>
+{% for comment in post.comments.all %}
+  <p>{{ comment.content }}</p>
+  <p>Author: {{ comment.author }}</p>
+  <p>Created at: {{ comment.created_at }}</p>
+  
+  {% if user == comment.author %}
+    <a href="{% url 'edit_comment' pk=comment.pk %}">Edit</a>
+    <a href="{% url 'delete_comment' pk=comment.pk %}">Delete</a>
+  {% endif %}
+  
+  <hr>
+{% empty %}
+  <p>No comments yet.</p>
+{% endfor %}
+
+<hr>
+<h3>Add a Comment:</h3>
+<form method="POST" action="{% url 'add_comment' pk=post.pk %}">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  <button type="submit">Post Comment</button>
+</form>
+
